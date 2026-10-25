@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capitol Ledger — Rayan Kuribayashi</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #0A1628;
+    --navy2:  #0F2040;
+    --navy3:  #1A3356;
+    --gold:   #C9A84C;
+    --gold2:  #E8C96A;
+    --steel:  #8899AA;
+    --white:  #F8F9FA;
+    --dim:    #B8C8D8;
+    --card:   #0D1E35;
+    --buy:    #4FA37C;
+    --sell:   #C97A6A;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 3rem;
+    background: rgba(10, 22, 40, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+  }
+
+  .nav-back {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: var(--steel);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .nav-back:hover { color: var(--gold); }
+
+  .nav-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+
+  .nav-logo span { color: var(--gold); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 72vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 7rem 3rem 3rem;
+  }
+
+  .ticker-wrap {
+    position: absolute;
+    right: -8%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(60vw, 620px);
+    aspect-ratio: 1;
+    opacity: 0.06;
+  }
+
+  .ticker-wrap svg { width: 100%; height: 100%; }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .hero-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.6rem, 6vw, 4.4rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+  }
+
+  .hero-name .accent { color: var(--gold); }
+
+  .hero-tagline {
+    font-size: 1.05rem;
+    color: var(--dim);
+    max-width: 540px;
+    line-height: 1.75;
+    margin-bottom: 2.2rem;
+  }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.9rem;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    border-radius: 2px;
+    color: var(--gold);
+    background: rgba(201, 168, 76, 0.07);
+  }
+
+  .status-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--steel);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .status-dot {
+    width: 0.45rem; height: 0.45rem;
+    border-radius: 50%;
+    background: var(--buy);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(79, 163, 124, 0.2);
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 5rem 3rem; }
+
+  .section-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .section-intro {
+    color: var(--dim);
+    max-width: 640px;
+    font-size: 0.975rem;
+    line-height: 1.75;
+    margin-bottom: 3rem;
+  }
+
+  /* ── MODULES ── */
+  .modules { background: var(--navy2); }
+
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .module-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 2rem;
+  }
+
+  .module-type {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .module-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.7rem;
+    color: var(--white);
+  }
+
+  .module-desc {
+    font-size: 0.9rem;
+    color: var(--steel);
+    line-height: 1.7;
+    margin-bottom: 1.4rem;
+  }
+
+  .module-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .meta-item { font-size: 0.78rem; }
+  .meta-k { color: var(--steel); display: block; margin-bottom: 0.2rem; }
+  .meta-v { font-family: 'IBM Plex Mono', monospace; color: var(--dim); }
+
+  /* ── BACKTEST STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 1.6rem;
+  }
+
+  .stat-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-number.pos { color: var(--buy); }
+  .stat-number.neg { color: var(--sell); }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--steel);
+    line-height: 1.4;
+  }
+
+  .caveat {
+    background: rgba(201, 168, 76, 0.06);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-left: 3px solid var(--gold);
+    border-radius: 2px;
+    padding: 1.4rem 1.6rem;
+    font-size: 0.9rem;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  .caveat strong { color: var(--white); }
+
+  /* ── AUTOMATION ── */
+  .automation { background: var(--navy2); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0;
+    counter-reset: step;
+  }
+
+  .flow-step {
+    flex: 1 1 200px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 1.6rem 1.4rem;
+    position: relative;
+  }
+
+  .flow-step + .flow-step { margin-left: 1.2rem; }
+
+  .flow-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+
+  .flow-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .flow-desc {
+    font-size: 0.82rem;
+    color: var(--steel);
+    line-height: 1.6;
+  }
+
+  /* ── STACK ── */
+  .tech-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .tech-pill {
+    font-size: 0.75rem;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 0.8rem;
+    background: rgba(136, 153, 170, 0.12);
+    border-radius: 2px;
+    color: var(--dim);
+  }
+
+  /* ── CTA ── */
+  .cta {
+    text-align: center;
+    padding: 5rem 3rem;
+  }
+
+  .cta .section-label { justify-content: center; }
+  .cta .section-label::before { display: none; }
+
+  .cta-text {
+    font-size: 0.975rem;
+    color: var(--steel);
+    max-width: 480px;
+    margin: 0 auto 2rem;
+    line-height: 1.75;
+  }
+
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.8rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary { background: var(--gold); color: var(--navy); }
+  .btn-primary:hover { background: var(--gold2); transform: translateY(-1px); }
+
+  .btn-ghost { border: 1px solid var(--steel); color: var(--steel); }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 1.8rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--steel);
+  }
+
+  footer a { color: var(--steel); text-decoration: none; }
+  footer a:hover { color: var(--gold); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 6rem 1.5rem 2.5rem; }
+    section { padding: 3.5rem 1.5rem; }
+    .flow-step + .flow-step { margin-left: 0; margin-top: 1.2rem; }
+    .flow { flex-direction: column; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://ryankuribayashi.github.io/#projects" class="nav-back">← Portfolio</a>
+  <span class="nav-logo">Capitol<span> Ledger</span></span>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="ticker-wrap" aria-hidden="true">
+    <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="10,320 60,280 110,300 160,210 210,240 260,140 310,170 390,90"
+        stroke="#C9A84C" stroke-width="2.5" fill="none"/>
+      <line x1="10" y1="360" x2="390" y2="360" stroke="#C9A84C" stroke-width="0.6"/>
+      <line x1="10" y1="10" x2="10" y2="360" stroke="#C9A84C" stroke-width="0.6"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Quantitative Research — 2026</p>
+    <h1 class="hero-name">Capitol<br><span class="accent">Ledger</span></h1>
+    <p class="hero-tagline">
+      Two research dashboards tracking public disclosure filings as a market signal — congressional
+      stock trades under the STOCK Act, and corporate insider buying under SEC Form 4 — refreshed
+      automatically every morning and tested against a real paper-trading backtest.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">Market Research</span>
+      <span class="tag">Python</span>
+      <span class="tag">Scheduled Agents</span>
+      <span class="tag">SEC &amp; STOCK Act Data</span>
+      <span class="tag">Alpaca Paper Trading</span>
+    </div>
+    <p class="status-note"><span class="status-dot"></span>Dashboards refresh daily via scheduled research agents — findings below reflect the latest backtest run</p>
+  </div>
+</section>
+
+<!-- MODULES -->
+<section class="modules" id="modules">
+  <p class="section-label">Two Trackers</p>
+  <h2 class="section-title">What it watches</h2>
+  <p class="section-intro">
+    Both trackers pull from the same idea: certain people have to disclose their stock trades by law,
+    and the gap between when they trade and when the public finds out is itself informative.
+  </p>
+
+  <div class="modules-grid">
+    <div class="module-card">
+      <p class="module-type">Congressional Disclosures</p>
+      <h3 class="module-title">Capitol Ledger</h3>
+      <p class="module-desc">
+        Tracks senators' and House members' stock trades filed under the STOCK Act, measuring disclosure
+        lag against the 45-day legal limit, breaking trades down by filer, party, and ticker, and separately
+        tracking the President's OGE Form 278/278-T trading disclosures (30-day window).
+      </p>
+      <div class="module-meta">
+        <div class="meta-item"><span class="meta-k">Legal limit</span><span class="meta-v">45 days to file</span></div>
+        <div class="meta-item"><span class="meta-k">Refresh</span><span class="meta-v">Daily, 7:00 AM MT</span></div>
+      </div>
+    </div>
+
+    <div class="module-card">
+      <p class="module-type">Corporate Insider Trading</p>
+      <h3 class="module-title">Insider Ledger</h3>
+      <p class="module-desc">
+        Tracks SEC Form 4 filings — executives, directors, and 10%+ owners buying or selling their own
+        company's stock — and flags genuine multi-insider cluster buys (the highest-conviction signal)
+        separately from single-insider accumulation or routine option exercises.
+      </p>
+      <div class="module-meta">
+        <div class="meta-item"><span class="meta-k">Filing window</span><span class="meta-v">2 business days</span></div>
+        <div class="meta-item"><span class="meta-k">Refresh</span><span class="meta-v">Daily, 7:10 AM MT</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BACKTEST -->
+<section class="backtest" id="backtest">
+  <p class="section-label">First Backtest</p>
+  <h2 class="section-title">Does copying these filings actually beat the market?</h2>
+  <p class="section-intro">
+    Run Sep 13, 2026 against a live Alpaca paper-trading connection. Method: for every disclosed
+    congressional buy, simulate buying on the <strong style="color:var(--white)">filing date</strong> —
+    the earliest a real copy-trader could have acted — and hold to the present, then compare that return
+    to SPY over the identical window.
+  </p>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number">25<span style="font-size:1rem;color:var(--steel);"> / 26</span></div>
+      <div class="stat-label">disclosed buys tested (1 excluded — mutual fund, no price data)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number pos">+0.9%</div>
+      <div class="stat-label">average trade return since filing date</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number neg">−0.2%</div>
+      <div class="stat-label">average SPY return, same 25 windows</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">48%</div>
+      <div class="stat-label">of individual trades beat SPY — a coin flip</div>
+    </div>
+  </div>
+
+  <div class="caveat">
+    <strong>Read this before drawing a conclusion:</strong> that average return is driven by a handful of
+    big winners (ORCL +14.4%, EL +20.6%, META +12.4%) — on a trade-by-trade basis it's close to a coin flip
+    whether any single copied buy beats just holding the index. Holding windows are also short and uneven
+    (11–37 days). This is one data point from a naive "copy everyone" strategy, not a validated edge. The
+    next pass filters trades to a member's own committee oversight jurisdiction — where research on
+    congressional trading suggests any real signal actually lives.
+  </div>
+</section>
+
+<!-- AUTOMATION -->
+<section class="automation" id="automation">
+  <p class="section-label">How It Runs</p>
+  <h2 class="section-title">Unattended, every morning</h2>
+  <p class="section-intro">
+    Both dashboards are maintained by scheduled research agents rather than manual updates — the pipeline
+    below repeats daily without anyone opening a terminal.
+  </p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">01</div>
+      <div class="flow-title">Pull filings</div>
+      <div class="flow-desc">Research new STOCK Act and SEC Form 4 filings from public sources each morning.</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">02</div>
+      <div class="flow-title">Verify &amp; classify</div>
+      <div class="flow-desc">Cross-check every figure before it's added; flag genuine multi-insider clusters vs. single-filer activity.</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">03</div>
+      <div class="flow-title">Update the ledger</div>
+      <div class="flow-desc">Recompute disclosure-lag stats and trade tables; publish the refreshed dashboard.</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">04</div>
+      <div class="flow-title">Backtest</div>
+      <div class="flow-desc">Run simulated trades through a connected Alpaca paper account to test the strategy against SPY.</div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section class="stack" id="stack">
+  <p class="section-label">Built With</p>
+  <h2 class="section-title">Stack</h2>
+  <div class="tech-row">
+    <span class="tech-pill">Python</span>
+    <span class="tech-pill">Alpaca Paper Trading API</span>
+    <span class="tech-pill">SEC EDGAR / Form 4</span>
+    <span class="tech-pill">STOCK Act Disclosures</span>
+    <span class="tech-pill">Scheduled Cloud Agents</span>
+    <span class="tech-pill">Claude</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <p class="section-label">Status</p>
+  <h2 class="section-title">Active research project</h2>
+  <p class="cta-text">
+    Currently in the committee-jurisdiction filtering phase — next step is re-running the backtest only
+    on trades inside a member's own oversight area. Dashboards are private research tools; reach out if
+    you'd like a walkthrough.
+  </p>
+  <div class="contact-links" style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+    <a href="mailto:ryankuribayashi3@gmail.com" class="btn btn-primary">Get in touch</a>
+    <a href="https://ryankuribayashi.github.io/#projects" class="btn btn-ghost">← Back to Portfolio</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Rayan Kuribayashi</span>
+  <a href="https://ryankuribayashi.github.io">ryankuribayashi.github.io</a>
+</footer>
+
+</body>
+</html>
